@@ -4,3 +4,6 @@ mysql_connector_python
 boto3
 pillow
 requests
+pytest
+pytest-cov
+pylint
