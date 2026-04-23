@@ -6,8 +6,8 @@ echo "Installing system dependencies..."
 # Update system packages
 yum -y update
 
-# Install Python3, MySQL client, and basic tools
-yum -y install python3 python3-pip mysql
+# Install Python3, Mariadb client, and basic tools
+yum -y install python3 python3-pip mariadb105
 
 # Install epel-release for additional packages
 amazon-linux-extras install -y epel
