@@ -9,9 +9,6 @@ yum -y update
 # Install Python3, Mariadb client, and basic tools
 yum -y install python3 python3-pip mariadb105
 
-# Install epel-release for additional packages
-amazon-linux-extras install -y epel
-
 # Install stress testing tool
 yum -y install stress
 
