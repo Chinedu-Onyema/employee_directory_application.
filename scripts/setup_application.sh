@@ -44,6 +44,7 @@ After=network.target
 [Service]
 User=root
 WorkingDirectory=/var/www/employee-directory
+Environment=\"FLASK_APP=application.py\"
 Environment=\"DATABASE_HOST=localhost\"
 Environment=\"DATABASE_USER=${DB_USER}\"
 Environment=\"DATABASE_PASSWORD=${DB_PASSWORD}\"
