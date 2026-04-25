@@ -21,10 +21,11 @@ DB_NAME="database-1"
 S3_BUCKET="my-photos-albums-123"
 
 # Set up MySQL database
+# Set up MySQL database
 echo "Initializing database..."
-sudo mysql -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME};"
+sudo mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
 sudo mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';"
+sudo mysql -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"
 sudo mysql -e "FLUSH PRIVILEGES;"
 
 # Create database tables
