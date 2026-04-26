@@ -17,10 +17,15 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField
 from wtforms import StringField, HiddenField, validators
 import boto3
+from botocore.client import Config
 
 import config
 import util
 
+s3_client = boto3.client(
+    "s3",
+    config=Config(signature_version='s3v4')
+)
 
 def get_instance_document():
     try:
@@ -99,7 +104,6 @@ def before_request():
 @application.route("/")
 def home():
     "Home screen"
-    s3_client = boto3.client("s3")
     employees = database.list_employees()
     if employees == 0:
         return render_template_string(
@@ -176,7 +180,6 @@ def add():
 @application.route("/edit/<employee_id>")
 def edit(employee_id):
     "Edit an employee"
-    s3_client = boto3.client("s3")
     employee = database.load_employee(employee_id)
     signed_url = None
     if "object_key" in employee and employee["object_key"]:
@@ -202,7 +205,6 @@ def edit(employee_id):
 def save():
     "Save an employee"
     form = EmployeeForm()
-    s3_client = boto3.client("s3")
     key = None
     if form.validate_on_submit():
         if form.photo.data:
@@ -247,7 +249,6 @@ def save():
 @application.route("/employee/<employee_id>")
 def view(employee_id):
     "View an employee"
-    s3_client = boto3.client("s3")
     employee = database.load_employee(employee_id)
     if "object_key" in employee and employee["object_key"]:
         try:
