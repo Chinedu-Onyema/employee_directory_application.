@@ -15,7 +15,11 @@ DB_PASSWORD="qLlP1O2dW3InDQVmBGqP"
 DB_NAME="employees"
 S3_BUCKET="my-photos-albums-123"
 
-# Create database tables on RDS (not local MySQL)
+# Create database tables on RDS
+echo "Creating database on RDS if it doesn't exist..."
+mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" -e "CREATE DATABASE IF NOT EXISTS employees;"
+
+# Create database tables on RDS
 echo "Initializing RDS database tables..."
 if [ -f database_create_tables.sql ]; then
     mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" "${DB_NAME}" < database_create_tables.sql
