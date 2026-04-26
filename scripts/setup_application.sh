@@ -8,30 +8,18 @@ cd /var/www/employee-directory
 # Install Python dependencies
 pip3 install -r requirements.txt
 
-# Install and start MySQL locally
-echo "Installing and configuring MySQL..."
-sudo yum install -y mariadb105-server
-sudo systemctl start mariadb
-sudo systemctl enable mariadb
-
 # Hardcoded secrets (replace with your actual values)
+DB_HOST="employees.c1408oeoalyx.eu-north-1.rds.amazonaws.com"
 DB_USER="admin"
-DB_PASSWORD="JmjX1SOL13YFY76Rv4dp"
-DB_NAME="database-1"
+DB_PASSWORD="qLlP1O2dW3InDQVmBGqP"
+DB_NAME="employees"
 S3_BUCKET="my-photos-albums-123"
 
-# Set up MySQL database
-# Set up MySQL database
-echo "Initializing database..."
-sudo mysql -e "CREATE DATABASE IF NOT EXISTS \`${DB_NAME}\`;"
-sudo mysql -e "CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASSWORD}';"
-sudo mysql -e "GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';"
-sudo mysql -e "FLUSH PRIVILEGES;"
-
-# Create database tables
+# Create database tables on RDS (not local MySQL)
+echo "Initializing RDS database tables..."
 if [ -f database_create_tables.sql ]; then
-    cat database_create_tables.sql | sudo mysql ${DB_NAME}
-    echo "Database tables created successfully"
+    mysql -h "${DB_HOST}" -u "${DB_USER}" -p"${DB_PASSWORD}" "${DB_NAME}" < database_create_tables.sql
+    echo "Database tables created successfully on RDS"
 fi
 
 # Create systemd service file
@@ -45,7 +33,7 @@ After=network.target
 User=root
 WorkingDirectory=/var/www/employee-directory
 Environment=\"FLASK_APP=application.py\"
-Environment=\"DATABASE_HOST=localhost\"
+Environment=\"DATABASE_HOST=${DB_HOST}\"
 Environment=\"DATABASE_USER=${DB_USER}\"
 Environment=\"DATABASE_PASSWORD=${DB_PASSWORD}\"
 Environment=\"DATABASE_DB_NAME=${DB_NAME}\"
@@ -58,4 +46,5 @@ WantedBy=multi-user.target
 EOF"
 
 echo "Application setup completed"
+
 
