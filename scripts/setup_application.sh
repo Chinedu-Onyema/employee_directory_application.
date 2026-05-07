@@ -11,7 +11,7 @@ pip3 install -r requirements.txt
 # Hardcoded secrets (replace with your actual values)
 DB_HOST="employees.c1408oeoalyx.eu-north-1.rds.amazonaws.com"
 DB_USER="admin"
-DB_PASSWORD="qLlP1O2dW3InDQVmBGqP"
+DB_PASSWORD="W7zWeZVYpq4LE4lm5jJa"
 DB_NAME="employees"
 S3_BUCKET="my-photos-albums-123"
 
