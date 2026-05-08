@@ -10,3 +10,9 @@ phases:
       - make lint
       - make format
       - make all
+
+artifacts:
+  files:
+    - '**/*'
+  name: BuildArtifact
+  discard-paths: no
