@@ -6,14 +6,13 @@ echo "Setting up application..."
 # where our application code is located/
 # This is where we will install dependencies and run our app.
 cd /var/www/employee-directory
+
 # Install Python dependencies
 pip3 install -r requirements.txt
-# Note: Database connection details should be provided via CodeDeploy environment
-sourced from appspec.yml
-# or through AWS Systems Manager Parameter Store, Secrets Manager, or environment
-variables.
-# The following assumes DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, and
-PHOTOS_BUCKET
+
+# Note: Database connection details should be provided via CodeDeploy environment sourced from appspec.yml
+# or through AWS Systems Manager Parameter Store, Secrets Manager, or environment variables.
+# The following assumes DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, and PHOTOS_BUCKET
 # are set via CodeDeploy or environment configuration.
 if
 	[ -z "$DATABASE_HOST" ] || [ -z "$DATABASE_USER" ] || [ -z
