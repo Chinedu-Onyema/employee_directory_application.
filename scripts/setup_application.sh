@@ -9,7 +9,7 @@ cd /var/www/employee-directory
 # Install Python dependencies
 pip3 install -r requirements.txt
 # Note: Database connection details should be provided via CodeDeploy environment
-sourced from appspec.yaml
+source from appspec.yaml
 # or through AWS Systems Manager Parameter Store, Secrets Manager, or environment
 variables.
 # The following assumes DATABASE_HOST, DATABASE_USER, DATABASE_PASSWORD, and
