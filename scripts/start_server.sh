@@ -14,7 +14,7 @@ Description=Employee Directory Flask Application
 After=network.target
 [Service]
 Type=simple
-User=ec2-user
+User=root
 WorkingDirectory=/var/www/employee-directory
 Environment="FLASK_APP=application.py"
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
