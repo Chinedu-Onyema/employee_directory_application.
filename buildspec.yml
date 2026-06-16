@@ -3,16 +3,15 @@ phases:
   install:
     commands:
       - make install
-      
+
   build:
     commands:
       - make test
       - make lint
       - make format
       - make all
-
 artifacts:
-files:
-- '**/*'
-name: Artifact
-discard-paths: no
+  files:
+    - '**/*'
+  name: Artifact
+  discard-paths: noo
