@@ -14,4 +14,4 @@ artifacts:
   files:
     - '**/*'
   name: Artifact
-  discard-paths: noo
+  discard-paths: no
