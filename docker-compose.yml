@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    container_name: dynamodb-prod-flask-app-container
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    volumes:
+      - ~/.aws:/root/.aws:ro
