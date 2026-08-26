@@ -108,3 +108,140 @@ resource "aws_dynamodb_table" "employees" {
         type = "S"
     }
 }
+
+
+import {
+  to = aws_ecr_repository.flaskapp
+  id = "prod-flask-app-image" 
+}
+
+
+# __generated__ by Terraform
+# Please review these resources and move them into your main configuration files.
+
+# __generated__ by Terraform from "prod-flask-app-image"
+resource "aws_ecr_repository" "flaskapp" {
+  force_delete         = null
+  image_tag_mutability = "MUTABLE"
+  name                 = "prod-flask-app-image"
+  region               = "eu-north-1"
+  tags                 = {}
+  tags_all             = {}
+  encryption_configuration {
+    encryption_type = "KMS"
+    kms_key         = "arn:aws:kms:eu-north-1:140023390772:key/66463763-1109-4926-923e-cc2b85718c64"
+  }
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+
+import {
+  to = aws_ecs_cluster.host
+  id = "prod-flask-app-image-cluster"   
+}
+
+import {
+  to = aws_ecs_task_definition.config
+  id = "arn:aws:ecs:eu-north-1:140023390772:task-definition/prod-flask-app-image-task-definition:2"  #
+}
+
+import {
+  to = aws_s3_bucket.infra
+  id = "my-photos-albums-123"          # your own s3 bucket name
+}
+
+
+# __generated__ by Terraform
+# Please review these resources and move them into your main configuration files.
+
+# __generated__ by Terraform from "prod-flask-app-image-cluster"
+resource "aws_ecs_cluster" "host" {
+  name     = "prod-flask-app-image-cluster"
+  region   = "eu-north-1"
+  tags     = {}
+  tags_all = {}
+  configuration {
+    execute_command_configuration {
+      kms_key_id = null
+      logging    = "DEFAULT"
+    }
+  }
+  setting {
+    name  = "containerInsights"
+    value = "disabled"
+  }
+}
+
+# __generated__ by Terraform from "arn:aws:ecs:eu-north-1:140023390772:task-definition/prod-flask-app-image-task-definition:2"
+resource "aws_ecs_task_definition" "config" {
+  container_definitions = jsonencode([{
+    environment = []
+    environmentFiles = [{
+      type  = "s3"
+      value = "arn:aws:s3:::my-photos-albums-123/env/25)_environment_variables.env"
+    }]
+    essential = true
+    image     = "140023390772.dkr.ecr.eu-north-1.amazonaws.com/prod-flask-app-image@sha256:7a782f7516cd22b1afa5e95831174dfac8e7b64ecb9eed6c1882129bd672ece5"
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        awslogs-create-group  = "true"
+        awslogs-group         = "/ecs/prod-flask-app-image-task-definition"
+        awslogs-region        = "eu-north-1"
+        awslogs-stream-prefix = "ecs"
+      }
+      secretOptions = []
+    }
+    mountPoints = []
+    name        = "flask-app-container"
+    portMappings = [{
+      appProtocol   = "http"
+      containerPort = 80
+      hostPort      = 80
+      name          = "flask-app-container-80-tcp"
+      protocol      = "tcp"
+      }, {
+      appProtocol   = "http"
+      containerPort = 443
+      hostPort      = 443
+      name          = "flask-app-container-443-tcp"
+      protocol      = "tcp"
+    }]
+    systemControls = []
+    ulimits        = []
+    volumesFrom    = []
+  }])
+  cpu                      = "1024"
+  enable_fault_injection   = false
+  execution_role_arn       = "arn:aws:iam::140023390772:role/ecsTaskExecutionRole"
+  family                   = "prod-flask-app-image-task-definition"
+  ipc_mode                 = null
+  memory                   = "2048"
+  network_mode             = "awsvpc"
+  pid_mode                 = null
+  region                   = "eu-north-1"
+  requires_compatibilities = ["FARGATE"]
+  skip_destroy             = null
+  tags                     = {}
+  tags_all                 = {}
+  task_role_arn            = null
+  track_latest             = false
+  runtime_platform {
+    cpu_architecture        = "X86_64"
+    operating_system_family = "LINUX"
+  }
+}
+
+# __generated__ by Terraform from "my-photos-albums-123"
+resource "aws_s3_bucket" "infra" {
+  bucket              = "my-photos-albums-123"
+  bucket_namespace    = "global"
+  force_destroy       = false
+  object_lock_enabled = false
+  region              = "eu-north-1"
+  tags                = {}
+  tags_all            = {}
+}
+
