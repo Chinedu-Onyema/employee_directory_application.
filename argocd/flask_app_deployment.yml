@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: employee-directory-deployment-app
+  labels:
+    app: flask-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: flask-app
+  template:
+    metadata:
+      labels:
+        app: flask-app
+    spec:
+      containers:
+      - name: employee-flask-application
+        image: edunaking/prod-flask-app-image:0.2     # i will push this exact docker image name 
+                                                      # and version to docker hub
+        ports:
+        - containerPort: 80
+        envFrom:
+        - secretRef:
+            name: flask-app-secrets                  # the name of your secret that holds your
+                                                     # your S3 bucket name and dynamo db table
+                                                     # this was created from the .env file
