@@ -192,7 +192,159 @@ In this phase, we move from manual local testing in Codespaces to automated test
 
 
 
-## PHASE 2: 
+## PHASE 2: MASTERING CONTINUOS INTEGRATION WITH AWS CODEBUILD AND PREPARING FOR CODEDEPLOY
+
+### INTRODUCTION
+This phase details how to set up robust automated testing within AWS to validate your application before every deployment, followed by the specific architectural steps needed to prepare your application for deployment via AWS CodeDeploy. 
+
+By completing this phase, you will secure your Software Development Life Cycle (SDLC) with a cloud-native build process and lay the critical groundwork—lifecycle scripts and the mandatory appspec.yml file—for Continuous Deployment to EC2 instances. 
+
+DevSecOps principles are heavily emphasized, using encrypted secrets for secure connections and GitOps as the foundational workflow.
+
+
+##### ACCESS MATERIALS
+
+##### PDF GUIDE 1: [BUILD AND TEST WITH AWS CODEBUILD.pdf](https://github.com/user-attachments/files/33763708/3.BUILD.AND.TEST.WITH.AWS.CODEBUILD.pdf)
+
+##### VIDEO WALKTHROUGH: https://youtu.be/IbT8WcHYn7M
+
+
+##### PDF GUIDE 2: [STEPS TO CREATING THE APPSPEC FILE FOR AWS CODEDEPLOY.pdf](https://github.com/user-attachments/files/33763885/4.STEPS.TO.CREATING.THE.APPSPEC.FILE.FOR.AWS.CODEDEPLOY.pdf)
+
+##### VIDEO WALKTHROUGH: https://youtu.be/cRlyxyUBGOk
+
+
+##### PART 1: ESTABLISHING CONTINUOUS INTEGRATION WITH AWS CODEBUILD
+
+This section outlines how to configure AWS CodeBuild, the cloud-native equivalent of GitHub Actions, to automatically compile code, run tests, lint for quality, and format style upon every push to your repository, ensuring enterprise-grade software health.
+
+1) Log in and Initialize:
+   Action: Log in to your AWS Management Console.
+   Search: Search for CodeBuild.
+   Navigate: In the CodeBuild dashboard, ensure Build history under Build is visible.
+   Click Build projects and then Create project.
+
+
+2) Configure Project Details:
+   Project name: Enter employee_directory_application. (Note: This is illustrative, ensure it matches your specific repository name).
+   Project type: Select Default project (to view build and test workflows within AWS).
+   Optional Description: Under Additional configuration, you can write a description like "Building and Testing with Codebuild."
+   Badge: Under Build badge-optional, check the box.
+
+
+3) Set up Source (Secure GitHub Connection):
+   Source: Under Source 1 -Primary, select GitHub (as your source provider).
+   Credentials Setup (via Secrets Manager): To connect, you must secure your GitHub Personal Access Token (PAT). Click Manage account credentials[cite: 13].
+   Credential Type: Personal access token.
+   Service: Secrets Manager (Recommended).
+   Secrets: New secrets.
+   Secret Name: GITHUB.
+   Optional Description: "This secret allows AWS Codebuild to connect to GitHub.
+
+   Generate Token (within GitHub):
+   Navigate in GitHub to Profile Picture -> Settings -> Developer Settings -> Personal Access Tokens -> Fine-grained tokens.
+   Generate new tokens named employee-application-token.
+   Description: "This is a token for employee build and test on AWS CodeBuild.
+   Expiration: Set to 30 days or desired duration.
+   Repository Access: Select Public repositories.
+   Click Generate token and COPY the token ID/Token.
+   Store it securely; you will not see it again.
+
+   Finalize Connection: Paste your generated GitHub token into the authentication page, completing the secure connection.
+
+
+4) Define Build Triggers and Environment:
+   Repository: Select Repository in my account and paste your specific repo's URL, like
+   [https://github.com/Chinedu-Onyema/employee_directory_application.git](https://github.com/Chinedu-Onyema/employee_directory_application.git).
+   Triggers: The Webhook box must be checked.
+   Comment approval: Select Disable.
+   Webhook event filter groups: Locate Event type and select PUSH. (This ensures only pushed commits, not pull requests, trigger this specific build).
+   Environment Variables: Under Environment -> Locate Environmental variables.
+
+   Secrets Manager Integration (Secure Variable Reference):
+   To securely provide variables to the build (like the key referenced as PHOTOS_BUCKET), create variables from Secrets Manager:
+   Name: PHOTOS_BUCKET (or the specific key used in your code).
+   Value: Paste the specific ARN for this secret from AWS Secrets Manager
+   (example format: arn:aws:secretsmanager:eu-north-1:140023390772:secret:employee-application-secrets-rBVR2r).
+   Type: Select Secrets Manager. (Alternative: If hardcoding plaintext is necessary, use PLAINTEXT type and enter any test value).
+
+
+5) Create and Commit buildspec.yml:
+   Action: Under Buildspec, select Use a buildspec file.
+   Navigate in GitHub:
+   Return to your employee_directory_application repository (via Codespaces or direct GitHub interaction) and create a new file named buildspec.yml in the root directory.
+   Codespaces terminal:
+
+   <PRR>touch buildspec.yml</PRE>
+
+   Populate buildspec.yml:
+   Copy and paste the script below, which utilizes commands derived from your project's Makefile:
+
+```
+version: 0.2
+phases:
+  install:
+    commands:
+      - make install
+  build:
+    commands:
+      - make test
+      - make lint
+      - make format
+      - make all
+```
+
+   **Commit changes:** 
+   <PRE>git status</PRE>
+   <PRE>git add .</PRE> 
+   <PRE>git commit -m "added buildspec.yml file"</PRE> 
+   <PRE>git push</PRE> 
    
+   (A workflow run in GitHub Actions will also be triggered).
+   **Back in AWS CodeBuild:** Under **BUILDSPEC Name Optional**, enter `buildspec.yml`. Leave other defaults and click **Create build project**.
+
+
+6) Troubleshooting Secrets Manager Policy Errors:
+   If your build fails due to a "Secrets Manager policy error" like the one below, take the following actions:
+   error: AccessDenied: User: arn:aws:sts::... assumes-role/... is not authorized to perform: secretsmanager:GetSecretValue on resource: ...
+   Search for **IAM** and select the service.
+   Locate **Roles** and search for the specific service role created for this project (e.g., `codebuild-employee_directory_application-service-role`).
+   Click the role -> **Add permissions** -> **Create inline policy**.
+   Policy Editor -> Select **JSON**. Remove default script and paste the following policy:
+
+```
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "SidGetSecretValue",
+      "Effect": "Allow",
+      "Action": [
+        "secretsmanager:GetSecretValue"
+          ],
+      "Resource": "*"
+    }
+  ]
+}
+```
+
+   Click **Next**. Give the policy a name, such as `codebuildsecretsmanagerinlinepolicy`, and click **Create policy**.
+   Verify that your service role now has two policies attached: the CodeBuild base policy and `codebuildsecretsmanagerinlinepolicy`.
+
+
+7) Verify CI Build and Add Status Badge to GitHub:
+   Navigate in AWS CodeBuild and click **Start build**.
+   Monitor progress in the **Build logs** tab.
+   Check for errors by clicking **View entire logs** or by tailing them. Ensure the build uses instructions from the provided `buildspec.yml` file.
+   Upon success, you receive a success message.
+   Click the **employee_directory_application** build project.
+   Scroll down to the **Project details** tab, click it, and **Copy badge URL**.
+   Navigate to your GitHub repository, click on the README file, click edit, and paste the URL from AWS CodeBuild, formatted as: `[![AWS](your_copied_url)]`.
+   Click commit changes.
+   Observe that a live build badge now displays the successful state of your code in AWS CodeBuild.
+
+
+
+##### PART 2: PREPARATION FOR AWS CODEDEPLOY TO EC2
 
 
