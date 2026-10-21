@@ -28,7 +28,7 @@ Furthermore, this section moves beyond manual testing by introducing GitHub Acti
 You will construct a YAML workflow file to create a Continuous Integration (CI) pipeline. 
 This pipeline automatically triggers these testing and quality assurance tasks whenever code is pushed to the repository, providing immediate feedback on commit health through status badges.
 
-##### ACCESS MATERIALS
+##### ACCESS PROJECT MATERIALS
 ##### PDF GUIDE 1: [BRANCHING STRATEGIES AND AUTOMATED TESTING (INSTALL TEST LINT FORMAT).pdf](https://github.com/user-attachments/files/33728680/BRANCHING.STRATEGIES.AND.AUTOMATED.TESTING.INSTALL.TEST.LINT.FORMAT.pdf)
 
 ##### VIDEO WALKTHROUGH: https://youtu.be/0PP6nW51THQ
@@ -38,7 +38,7 @@ This pipeline automatically triggers these testing and quality assurance tasks w
 ##### VIDEO WALKTHROUGH: https://youtu.be/Ilk183UXMac
 
 
-##### PART 1: STEPS TO INSTALL, TEST, LINT, AND FORMAT PYTHON APPLICATION FILES
+### PART 1: STEPS TO INSTALL, TEST, LINT, AND FORMAT PYTHON APPLICATION FILES
 
 1) Configure Environment:
    Log in to GitHub, navigate to the employee_directory_repository, and open Codespaces. 
@@ -118,7 +118,7 @@ This pipeline automatically triggers these testing and quality assurance tasks w
     <PRE>git commit -m "Finished testing locally."</PRE>
 
 
-##### PART 2: STEPS TO SET UP GITHUB ACTIONS FOR AUTOMATED CONTINUOS INTEGRATION (CI)
+### PART 2: STEPS TO SET UP GITHUB ACTIONS FOR AUTOMATED CONTINUOS INTEGRATION (CI)
 
 GitHub Actions automates tasks within your repository. 
 In this phase, we move from manual local testing in Codespaces to automated testing whenever code changes occur, particularly when merging from a feature branch to the main branch for production.
@@ -202,7 +202,7 @@ By completing this phase, you will secure your Software Development Life Cycle (
 DevSecOps principles are heavily emphasized, using encrypted secrets for secure connections and GitOps as the foundational workflow.
 
 
-##### ACCESS MATERIALS
+##### ACCESS PROJECT MATERIALS
 
 ##### PDF GUIDE 1: [BUILD AND TEST WITH AWS CODEBUILD.pdf](https://github.com/user-attachments/files/33763708/3.BUILD.AND.TEST.WITH.AWS.CODEBUILD.pdf)
 
@@ -214,7 +214,7 @@ DevSecOps principles are heavily emphasized, using encrypted secrets for secure 
 ##### VIDEO WALKTHROUGH: https://youtu.be/cRlyxyUBGOk
 
 
-##### PART 1: ESTABLISHING CONTINUOUS INTEGRATION WITH AWS CODEBUILD
+### PART 1: ESTABLISHING CONTINUOUS INTEGRATION WITH AWS CODEBUILD
 
 This section outlines how to configure AWS CodeBuild, the cloud-native equivalent of GitHub Actions, to automatically compile code, run tests, lint for quality, and format style upon every push to your repository, ensuring enterprise-grade software health.
 
@@ -345,6 +345,95 @@ phases:
 
 
 
-##### PART 2: PREPARATION FOR AWS CODEDEPLOY TO EC2
+### PART 2: PREPARATION FOR AWS CODEDEPLOY TO EC2
+
+This section details the critical steps needed to architect your development environment for deployment, move away from rigid monolithic infrastructure, and create the required lifecycle scripts and AppSpec file necessary for deployment to Linux EC2 instances via AWS CodeDeploy.
+
+1) Synchronize Environments in GitHub Codespaces:
+   **Locate repository:** Log in to GitHub, locate your `employee_directory_application` repo, and open Codespaces.
+   **Sync Branch:** Ensure your current Codespaces environment is in sync with your remote main branch (GitHub).
+   Execute the command:
+    
+   <PRE>git pull</PRE>
+   This will synchronize all changes made manually in the remote main branch (GitHub) to the local main branch (Codespaces).
+   It ensures the `buildspec.yml` file is now present in your Codespaces environment.
 
 
+2) Create Automation Scripts (`scripts/` folder):
+   You must create several lifecycle hook scripts to automate the installation of dependencies and initialization of the application on the EC2 target.
+
+   **Create directory:**
+   <PRE>mkdir scripts</PRE>
+    
+   **Create Install Script:** Change to the scripts directory and create `install_dependencies.sh`:
+   
+   <PRE>cd scripts</PRE>
+   <PRE>touch install_dependencies.sh</PRE>
+   
+   **Populate `install_dependencies.sh`:**
+
+   **Create Setup Script:** create `setup_application.sh`:
+    
+   <PRE>touch setup_application.sh</PRE>
+   
+   **Populate `setup_application.sh`:**
+
+   **Create Start Script:** create `start_server.sh`
+
+   <PRE>touch start_server.sh</PRE>
+
+   **Populate `start_server.sh`:**
+
+   **Create Stop Script:** create `stop_server.sh`:
+
+   <PRE>touch stop_server.sh</PRE>
+
+   **Populate `stop_server.sh`:**
+
+   **Create Validate Script:** create `validate_service.sh`:
+
+   <PRE>touch validate_service.sh</PRE>
+
+   **Populate `validate_service.sh`:**
+
+
+3) Configure Mandatory `appspec.yml` File:
+   The `appspec.yml` file is mandatory for CodeDeploy and orchestrates the deployment flow and hook executions on the target EC2 instance[cite: 3, 4].
+
+   **Exit scripts directory:** cd ...
+   **Create AppSpec:** `touch appspec.yml`.
+   **Populate `appspec.yml`:**
+
+
+4) Save Changes and Format Scripts:
+   **Save changes to GitHub:**
+   Commit your new scripts and the `appspec.yml` file
+
+   <PRE>git status</PRE>
+   <PRE>git add .</PRE>
+   <PRE>git commit -m "added appspec.yml file and scripts for deployment."</PRE>
+   <PRE>git push</PRE>
+
+   Verify a new successful workflow run under the GitHub Actions tab.
+   **Format Bash Scripts (Optional but Recommended):**
+   To ensure proper formatting of your `.sh` files, install and use `shfmt`:
+   Install `shfmt` in Codespaces:
+   <PRE>wget https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64 -O shfmt && chmod +x shfmt && sudo mv shfmt /usr/local/bin/</PRE>
+   <PRE>shfmt --version</PRE>
+
+   Change to scripts folder and format all files recursively:
+
+   <PRE>cd scripts</PRE>
+   <PRE>shfmt -w install_dependencies.sh</PRE>
+   <PRE>shfmt -w setup_application.sh</PRE>
+   <PRE>shfmt -w start_server.sh</PRE>
+   <PRE>shfmt -w stop_server.sh</PRE>
+   <PRE>shfmt -w validate_service.sh</PRE>
+
+   **Save and Push Formatted Changes:**
+    
+   <PRE>git status</PRE>
+   <PRE>git add .</PRE>
+   <PRE>git commit -m "added appspec.yml file for deployment."</PRE>
+   <PRE>git push</PRE>
+   
