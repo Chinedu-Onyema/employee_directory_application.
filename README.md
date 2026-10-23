@@ -3,7 +3,7 @@
 [![AWS](https://codebuild.eu-north-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMGpJS3kvRGg5dEZQTlNuOUxhVXdKbWtKcmlqTVBROFN4TFZYeU9ZTDFXeG8vQlRvSlRqZ0ptNGRyZHkybm9tQ05nVkpYZmpzM3YrSldhNlp3aEVFRTk0PSIsIml2UGFyYW1ldGVyU3BlYyI6ImQ4c0tuVHpQU2VZRWVZVzIiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=main)
 
 
-# Multi-Environment Deployment of Python Flask Application
+# Employee Directory Application: End-to-End DevOps, CI/CD, Kubernetes & GitOps Deployment
 
 This repository provides comprehensive, multi-stage deployment instructions for the Employee Directory Application, a Python Flask web app. 
 
