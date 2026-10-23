@@ -7,7 +7,7 @@
 
 This repository provides comprehensive, multi-stage deployment instructions for the Employee Directory Application, a Python Flask web app. 
 
-This project demonstrates a complete DevOps lifecycle, starting from local development, testing, and CI/CD pipelines, advancing to advanced container orchestration using Docker, Docker Compose, Amazon ECS with AWS Fargate, and culminating in a production-grade, multi-cluster Kubernetes deployment using Amazon EKS and Argo CD for GitOps.
+This project demonstrates a complete DevOps lifecycle, starting from local development, testing, and CI/CD pipelines (GitHub Actions, AWS CodeBuild, CodeDeploy, CodePipeline), advancing to advanced container orchestration using Docker, Docker Compose, Amazon ECS with AWS Fargate, and culminating in a production-grade, multi-cluster Kubernetes deployment using Amazon EKS and Argo CD for GitOps.
 
 The instructions guide you through establishing security best practices like Role-Based Access Control (RBAC), optimizing containers with multi-stage builds and .dockerignore files, and managing cloud infrastructure efficiently with Terraform. 
 
