@@ -1324,7 +1324,7 @@ Within this phase, we will cover authenticating with GHCR, tagging and pushing i
 
 
 
-## PHASE 8: COMPREHENSIVE PRODUCTION MULTI-CLUSTER GITOPS DEPLOYMENT ON AMAZON EKS WITH ARGO CD
+## PHASE 8: MULTI-CLUSTER EKS DEPLOYMENT WITH ARGO CD
 
 ### INTRODUCTION   
 This phase describes transitions away from rigid monolithic infrastructure towards a fully disposable, scalable GitOps deployment model. 
@@ -1337,5 +1337,63 @@ In this guide, we will constructs and secure a highly available, fault-tolerant 
 
 ##### PDF GUIDE: [COMPREHENSIVE GUIDE TO PRODUCTION READY EKS FOR MULTI CLUSTER DEPLOYMENT FOR A FLASK PP WITH ARGO CD.pdf](https://github.com/user-attachments/files/33843884/10.COMPREHENSIVE.GUIDE.TO.PRODUCTION.READY.EKS.FOR.MULTI.CLUSTER.DEPLOYMENT.FOR.A.FLASK.PP.WITH.ARGO.CD.pdf)
 
-
 ##### VIDEO WALKTHROUGH: https://youtu.be/ahtEWsUEujE
+
+
+### STEP-BY-STEP DEPLOYMENT GUIDE
+
+
+1) CREATE IAM ROLES FOR THE EKS CLUSTER AND WORKER NODE GROUP.
+   EKS Cluster Role: Create an IAM role named EKSClusterRole using the EKS service use case, attaching the default Amazon EKS cluster policy.
+   Node Group Role: Create an IAM role named EKSWorkerNodesRole using the EC2 service use case and attach the managed policies AmazonEKSWorkerNodePolicy, AmazonEKS_CNI_Policy, and AmazonEC2ContainerRegistryReadOnly.
+
+2) CREATE HUB/CENRAL AND SUPPORT EKS CLUSTERS.
+   Create a cluster named hub-central using custom configurations with EKS Auto Mode disabled, using EKSClusterRole, allowing cluster administrator access, selecting EKS API and configmap authentication mode, and choosing two public subnets in two different availability zones.
+   Configure add-ons such as Amazon VPC CNI and create its role (AmazonEKSPodIdentityAmazonVPCCNIRole), removing External DNS.
+   Follow the same steps to create a second cluster named support-cluster using subnets eu-north-1a and eu-north-1b.
+
+3) CREATE WORKER NODES IN A NODE GROUP.
+   Select the hub-central cluster, go to Compute, click Add Node Group, name it worker-nodes-group, select EKSWorkerNodesRole, choose an instance type like t3.large, and complete the creation.
+   Follow the same steps for the support-cluster.
+
+4) GRANT AN AWS CLI USER EKS CLUSTER PERMISSIONS.
+   Go to the hub-central cluster access page, click IAM access entries, select your IAM principal (e.g., onyema_2), and add the access policies AmazonEKSAdminPolicy and AmazonEKSClusterAdminPolicy.
+   Repeat the process for the support-cluster.
+
+5) LOG IN TO AWS CLI AND UPDATE KUBERNETES CONFIGURATION (kubectl).
+   Install eksctl if needed and update your local kubeconfig for both clusters using the AWS CLI:
+
+   <PRE>aws eks update-kubeconfig --name=hub-central --region=eu-north-1</PRE>
+   <PRE>aws eks update-kubeconfig --name=support-cluster --region=eu-north-1</PRE>
+
+   Verify contexts using <PRE>kubectl config get-contexts</PRE> and check pods across namespaces.
+
+6) CREATE KUBERNETES MANIFESTS AND BUILD DOCKER IMAGES.
+   Create Kubernetes secrets from your .env file (configured for DynamoDB mode) using kubectl create secret generic flask-app-secrets --from-env-file=.env on your clusters.
+   Create an argocd directory containing flask_app_deployment.yml (specifying container port 80 and environment secrets from flask-app-secrets) and flask_app_service.yml.
+   Build your Flask application Docker image (e.g., edunaking/prod-flask-app-image:0.2) and push it to Docker Hub. Push code changes to GitHub.
+
+
+7) INSTALL ARGO CD AND LOG IN VIA THE USER INTERFACE.
+   Create the argocd namespace on the hub-central cluster and apply the install manifests:
+
+   <PRE>kubectl create namespace argocd</PRE>
+   <PRE>kubectl apply -n argocd --server-side --force-conflicts -f https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml</PRE>
+
+   Configure Argo CD for HTTP protocol by editing the argocd-cmd-params-cm ConfigMap to include server.insecure: "true".
+   Edit the argocd-server service type to LoadBalancer to access the Argo CD UI via the external ELB address.
+   Retrieve the initial admin password from the argocd-initial-admin-secret secret and decode it using base64 to log into the UI.
+
+8) ADD CLUSTERS TO ARGO CD VIA ARGO CD CLI.
+   Install the Argo CD CLI on your local machine and log in:
+
+   <PRE>argocd login <load-balancer-url> --username admin --password <decoded-password> --insecure</PRE>
+
+   Ensure the support-cluster private API endpoint is set to false (endpointPrivateAccess=false, endpointPublicAccess=true) using <PRE>aws eks update-cluster-config</PRE>.
+   Add the support cluster to Argo CD:
+
+   <PRE>argocd cluster add <your-cluster-arn> --server <your-load-balancer-url></PRE>
+
+9) DEPLOY THE FLASK APPLICATION TO MULTIPLE EKS CLUSTERS.
+   In the Argo CD UI, click Create Application, configure the application name (employee-directory-app-deployment), select the default project, enable automatic sync, point the repository URL to your GitHub repository, set the path to argocd, and select your destination cluster URLs.
+   Observe that Argo CD syncs the application successfully, and verify deployments, pods, and services (kubectl get deploy, kubectl get pods, kubectl get svc) on both the hub-central and support-cluster instances. 
