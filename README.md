@@ -13,6 +13,8 @@ The instructions guide you through establishing security best practices like Rol
 
 The project highlights a complete application transformation, including architecture migration from a monolith to microservices and database flexibility between Amazon RDS (MySQL) and Amazon DynamoDB.
 
+IMPORTANT NOTE: Each phase includes a downloadable PDF guide and a step-by-step video walkthrough to help you follow the deployment process.
+
 
 ## PHASE 1: LOCAL DEVELOPMENT, TESTING, AND CONTINUOUS INTEGRATION
 
