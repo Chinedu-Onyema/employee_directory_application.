@@ -1339,7 +1339,7 @@ In this guide, we will constructs and secure a highly available, fault-tolerant 
 
 ##### PDF GUIDE: [COMPREHENSIVE GUIDE TO PRODUCTION READY EKS FOR MULTI CLUSTER DEPLOYMENT FOR A FLASK PP WITH ARGO CD.pdf](https://github.com/user-attachments/files/33843884/10.COMPREHENSIVE.GUIDE.TO.PRODUCTION.READY.EKS.FOR.MULTI.CLUSTER.DEPLOYMENT.FOR.A.FLASK.PP.WITH.ARGO.CD.pdf)
 
-##### VIDEO WALKTHROUGH: https://youtu.be/ahtEWsUEujE
+##### VIDEO WALKTHROUGH: https://youtu.be/NYEduh1C_2E
 
 
 ### STEP-BY-STEP DEPLOYMENT GUIDE
